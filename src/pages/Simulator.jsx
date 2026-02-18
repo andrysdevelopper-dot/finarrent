@@ -1,5 +1,6 @@
 import { useFinancingCalculator } from '../hooks/useFinancingCalculator';
 import { Link } from 'react-router-dom';
+import SEO from '../components/utils/SEO';
 import PageTransition from '../components/animations/PageTransition';
 import ScrollReveal from '../components/animations/ScrollReveal';
 
@@ -17,6 +18,10 @@ const Simulator = () => {
 
   return (
     <PageTransition>
+      <SEO
+        title="Simulateur de financement"
+        description="Simulez votre financement professionnel en temps réel. Obtenez une estimation de vos mensualités pour crédit-bail et LOA."
+      />
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-32 pb-20 bg-gradient-to-br from-gray-50 via-white to-indigo-50">
@@ -40,7 +45,7 @@ const Simulator = () => {
           <div className="container mx-auto px-6">
             <ScrollReveal>
               <div className="max-w-5xl mx-auto">
-                <div className="bg-gradient-to-br from-gray-50 to-indigo-50 rounded-3xl shadow-2xl p-10 border border-gray-200">
+                <div className="bg-gradient-to-br from-gray-50 to-indigo-50 rounded-3xl shadow-2xl p-6 sm:p-10 border border-gray-200">
                   {/* Inputs */}
                   <div className="grid md:grid-cols-2 gap-8 mb-8">
                     <div className="space-y-4">
@@ -109,7 +114,7 @@ const Simulator = () => {
                     <div className="grid md:grid-cols-2 gap-8 mb-6">
                       <div>
                         <div className="text-sm text-gray-600 mb-1">Mensualité estimée</div>
-                        <div className="text-5xl font-bold text-primary mb-2">
+                        <div className="text-3xl sm:text-5xl font-bold text-primary mb-2">
                           {monthlyPayment.toLocaleString()} €
                         </div>
                         <div className="text-sm text-gray-500">*Estimation indicative hors assurance</div>
@@ -142,6 +147,15 @@ const Simulator = () => {
 
                     <Link
                       to="/contact"
+                      state={{
+                        fromSimulator: {
+                          amount,
+                          duration,
+                          monthlyPayment,
+                          totalCost,
+                          interestRate
+                        }
+                      }}
                       className="btn-primary w-full flex items-center justify-center space-x-2"
                     >
                       <span>Faire une demande de financement</span>

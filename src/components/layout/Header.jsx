@@ -1,13 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth0 } from '@auth0/auth0-react';
+// import { useAuth0 } from '@auth0/auth0-react';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const location = useLocation();
-  const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
+  // const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
+  
+  // Temporary mock values for development without Auth0
+  const isAuthenticated = false;
+  const isLoading = false;
+  const user = null;
+  const loginWithRedirect = () => console.log('Auth disabled');
+  const logout = () => console.log('Auth disabled');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,9 +26,10 @@ const Header = () => {
   }, []);
 
   const solutions = [
-    { name: 'Crédit-bail', icon: 'fa-handshake', path: '/solutions#credit-bail' },
-    { name: 'Location avec option d\'achat', icon: 'fa-file-contract', path: '/solutions#loa' },
-    { name: 'Crédit professionnel', icon: 'fa-coins', path: '/solutions#credit-pro' }
+    { name: 'Crédit-bail', icon: 'fa-handshake', path: '/solutions/credit-bail' },
+    { name: 'Location avec option d\'achat', icon: 'fa-file-contract', path: '/solutions/loa' },
+    { name: 'Crédit professionnel', icon: 'fa-coins', path: '/solutions/credit-pro' },
+    { name: 'Assurance professionnelle', icon: 'fa-shield-halved', path: '/assurance' }
   ];
 
   const sectors = [
@@ -31,20 +39,31 @@ const Header = () => {
     { name: 'Transport & Logistique', icon: 'fa-truck', path: '/sectors#transport' }
   ];
 
+  // Sur la page d'accueil en haut = Hero sombre → texte clair. Sinon ou après scroll = fond clair → texte sombre
+  const isOverDarkHero = location.pathname === '/' && !isScrolled;
+  const navLinkClass = isOverDarkHero
+    ? 'text-white/95 hover:text-white'
+    : 'text-gray-700 hover:text-secondary';
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+        isScrolled
+          ? 'bg-white/95 backdrop-blur-md shadow-lg'
+          : isOverDarkHero
+            ? 'bg-primary/20 backdrop-blur-sm'
+            : 'bg-transparent'
       }`}
     >
-      <nav className="container mx-auto px-6 py-4">
+      <nav className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-secondary to-accent rounded-lg flex items-center justify-center">
-              <i className="fa-solid fa-chart-line text-white text-xl"></i>
-            </div>
-            <span className="text-2xl font-bold text-primary">Finassur</span>
+          <Link to="/" className="flex items-center">
+            <img
+              src="/Finassurs_logo.jpeg"
+              alt="Finassur - Financement professionnel"
+              className="h-10 sm:h-12 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -55,7 +74,7 @@ const Header = () => {
               onMouseEnter={() => setOpenDropdown('solutions')}
               onMouseLeave={() => setOpenDropdown(null)}
             >
-              <button className="text-gray-700 hover:text-secondary font-medium flex items-center space-x-1 transition-colors">
+              <button className={`${navLinkClass} font-medium flex items-center space-x-1 transition-colors`}>
                 <span>Nos Solutions</span>
                 <i className="fa-solid fa-chevron-down text-xs"></i>
               </button>
@@ -85,7 +104,7 @@ const Header = () => {
               onMouseEnter={() => setOpenDropdown('sectors')}
               onMouseLeave={() => setOpenDropdown(null)}
             >
-              <button className="text-gray-700 hover:text-secondary font-medium flex items-center space-x-1 transition-colors">
+              <button className={`${navLinkClass} font-medium flex items-center space-x-1 transition-colors`}>
                 <span>Secteurs Financés</span>
                 <i className="fa-solid fa-chevron-down text-xs"></i>
               </button>
@@ -109,13 +128,16 @@ const Header = () => {
               </div>
             </div>
 
-            <Link to="/why-leasing" className="text-gray-700 hover:text-secondary font-medium transition-colors">
+            <Link to="/assurance" className={`${navLinkClass} font-medium transition-colors`}>
+              Assurance
+            </Link>
+            <Link to="/why-leasing" className={`${navLinkClass} font-medium transition-colors`}>
               Pourquoi Finassur
             </Link>
-            <Link to="/blog" className="text-gray-700 hover:text-secondary font-medium transition-colors">
+            <Link to="/blog" className={`${navLinkClass} font-medium transition-colors`}>
               Actualités
             </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-secondary font-medium transition-colors">
+            <Link to="/contact" className={`${navLinkClass} font-medium transition-colors`}>
               Contact
             </Link>
           </div>
@@ -144,7 +166,11 @@ const Header = () => {
                 ) : (
                   <button
                     onClick={() => loginWithRedirect()}
-                    className="hidden lg:block px-6 py-2.5 text-secondary font-semibold hover:bg-secondary hover:text-white rounded-lg transition-all duration-300 border-2 border-secondary"
+                    className={`hidden lg:block px-6 py-2.5 font-semibold rounded-lg transition-all duration-300 border-2 ${
+                      isOverDarkHero
+                        ? 'text-white border-white/80 hover:bg-white/20'
+                        : 'text-secondary border-secondary hover:bg-secondary hover:text-white'
+                    }`}
                   >
                     Connexion
                   </button>
@@ -153,15 +179,16 @@ const Header = () => {
             )}
             <Link
               to="/simulator"
-              className="px-6 py-2.5 bg-gradient-to-r from-secondary to-accent text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-gradient-to-r from-secondary to-accent text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center"
             >
-              Simuler mon projet
+              <span className="hidden sm:inline">Simuler mon projet</span>
+              <i className="fa-solid fa-calculator sm:hidden text-lg"></i>
             </Link>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-gray-700"
+              className={`lg:hidden ${isOverDarkHero ? 'text-white' : 'text-gray-700'}`}
             >
               <i className={`fa-solid ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-2xl`}></i>
             </button>
@@ -170,39 +197,46 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
+          <div className={`lg:hidden mt-4 pb-4 pt-4 border-t ${isOverDarkHero ? 'border-white/20' : 'border-gray-200'}`}>
             <div className="space-y-4">
               <Link
                 to="/solutions"
-                className="block text-gray-700 hover:text-secondary font-medium transition-colors"
+                className={`block font-medium transition-colors ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Nos Solutions
               </Link>
               <Link
                 to="/sectors"
-                className="block text-gray-700 hover:text-secondary font-medium transition-colors"
+                className={`block font-medium transition-colors ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Secteurs Financés
               </Link>
               <Link
+                to="/assurance"
+                className={`block font-medium transition-colors ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Assurance
+              </Link>
+              <Link
                 to="/why-leasing"
-                className="block text-gray-700 hover:text-secondary font-medium transition-colors"
+                className={`block font-medium transition-colors ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Pourquoi Finassur
               </Link>
               <Link
                 to="/blog"
-                className="block text-gray-700 hover:text-secondary font-medium transition-colors"
+                className={`block font-medium transition-colors ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Actualités
               </Link>
               <Link
                 to="/contact"
-                className="block text-gray-700 hover:text-secondary font-medium transition-colors"
+                className={`block font-medium transition-colors ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Contact
@@ -213,7 +247,7 @@ const Header = () => {
                     loginWithRedirect();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left text-secondary font-semibold"
+                  className={`block w-full text-left font-semibold ${isOverDarkHero ? 'text-white' : 'text-secondary'}`}
                 >
                   Connexion
                 </button>

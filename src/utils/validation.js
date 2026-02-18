@@ -46,6 +46,11 @@ export const validateForm = (formData, requiredFields) => {
         errors.siren = 'SIREN invalide (9 chiffres requis)';
     }
 
+    // RGPD consent validation
+    if (requiredFields.includes('consent') && !formData.consent) {
+        errors.consent = 'Vous devez accepter la politique de confidentialité';
+    }
+
     return {
         isValid: Object.keys(errors).length === 0,
         errors

@@ -37,7 +37,7 @@ const FooterLegal = () => {
       {/* Copyright */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
         <div className="text-white/60 text-sm text-center md:text-left">
-          © 2024 Finassur. Tous droits réservés.
+          © 2025 Finassur. Tous droits réservés.
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ const Blog = () => {
     try {
       await emailjs.send(
         emailJSConfig.serviceId,
-        emailJSConfig.templateId,
+        emailJSConfig.templateNewsletter,
         {
           to_name: 'Équipe Finassur',
           from_name: 'Nouvel Abonné Blog',

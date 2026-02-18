@@ -7,7 +7,7 @@ import FooterNewsletter from './footer/FooterNewsletter';
 const Footer = () => {
   return (
     <footer className="bg-primary text-white pt-12 pb-6">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         
         {/* Top Section: Company, Nav, Newsletter combined */}
         <div className="grid lg:grid-cols-12 gap-12 mb-12">

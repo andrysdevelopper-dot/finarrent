@@ -1,4 +1,5 @@
 import SolutionCard from '../components/ui/SolutionCard';
+import SEO from '../components/utils/SEO';
 import { solutionsData } from '../assets/data/solutions';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/animations/PageTransition';
@@ -7,6 +8,10 @@ import ScrollReveal from '../components/animations/ScrollReveal';
 const Solutions = () => {
   return (
     <PageTransition>
+      <SEO
+        title="Solutions de financement"
+        description="Crédit-bail, LOA, crédit professionnel. Découvrez nos solutions de financement adaptées aux équipements professionnels."
+      />
       <div className="min-h-screen">
         {/* Hero Section */}
         <section className="pt-32 pb-20 bg-gradient-to-br from-gray-50 via-white to-indigo-50">
@@ -98,7 +103,7 @@ const Solutions = () => {
         {/* CTA Section */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-6">
-            <div className="max-w-4xl mx-auto bg-gradient-to-r from-secondary to-accent rounded-3xl p-12 text-white text-center">
+            <div className="max-w-4xl mx-auto bg-gradient-to-r from-secondary to-accent rounded-3xl p-6 sm:p-12 text-white text-center">
               <h2 className="text-4xl font-bold mb-6">Besoin de conseils ?</h2>
               <p className="text-xl text-white/90 mb-8">
                 Nos experts vous accompagnent pour choisir la solution la plus adaptée à votre projet.

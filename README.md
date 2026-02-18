@@ -35,13 +35,17 @@ Créez un fichier `.env` à la racine du projet en vous basant sur `.env.example
 
 ```env
 # Auth0 Configuration
-REACT_APP_AUTH0_DOMAIN=your-domain.auth0.com
-REACT_APP_AUTH0_CLIENT_ID=your_client_id
+VITE_AUTH0_DOMAIN=your-domain.auth0.com
+VITE_AUTH0_CLIENT_ID=your_client_id
 
 # EmailJS Configuration
-REACT_APP_EMAILJS_SERVICE_ID=your_service_id
-REACT_APP_EMAILJS_TEMPLATE_ID=your_template_id
-REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_TEMPLATE_NEWSLETTER=your_newsletter_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
+
+# reCAPTCHA v3 (anti-spam)
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 ```
 
 ### Configuration Auth0
@@ -58,17 +62,17 @@ REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 
 1. Créez un compte sur [EmailJS](https://www.emailjs.com/)
 2. Créez un nouveau service email
-3. Créez un template d'email avec les variables suivantes:
-   - `{{to_name}}` - Nom du destinataire
-   - `{{from_name}}` - Nom de l'expéditeur
-   - `{{company_name}}` - Nom de l'entreprise
-   - `{{siren}}` - Numéro SIREN
-   - `{{sector}}` - Secteur d'activité
-   - `{{amount}}` - Montant du projet
-   - `{{email}}` - Email
-   - `{{phone}}` - Téléphone
-   - `{{message}}` - Message
-4. Copiez le Service ID, Template ID et Public Key dans votre fichier `.env`
+3. Créez **deux templates** EmailJS :
+
+   **Template Contact** (financement/assurance) - variables :
+   - `{{to_name}}`, `{{from_name}}`, `{{request_type}}`, `{{company_name}}`, `{{siren}}`, `{{sector}}`, `{{amount}}`, `{{equipment_type}}`, `{{email}}`, `{{phone}}`, `{{message}}`, `{{recaptcha_token}}`
+
+   **Template Newsletter** - variables :
+   - `{{to_name}}`, `{{from_name}}`, `{{email}}`, `{{message}}`, `{{type}}`
+
+4. Créez une clé reCAPTCHA v3 sur [Google reCAPTCHA](https://www.google.com/recaptcha/admin)
+
+5. Copiez les IDs dans votre fichier `.env`
 
 ## 🚀 Démarrage
 

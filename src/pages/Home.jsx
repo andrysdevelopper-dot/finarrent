@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import SEO from '../components/utils/SEO';
 import SectorCard from '../components/ui/SectorCard';
 import ProcessStep from '../components/ui/ProcessStep';
 import StatsCard from '../components/ui/StatsCard';
@@ -54,6 +55,10 @@ const Home = () => {
 
   return (
     <PageTransition>
+      <SEO
+        title="Financement professionnel - Crédit-bail & LOA"
+        description="Finassur accompagne les entreprises : crédit-bail, LOA, solutions de financement. De 3 000€ à 500 000€, réponse en 48h. Simulez votre projet en ligne."
+      />
       <div className="min-h-screen">
         <Hero />
         
@@ -64,7 +69,7 @@ const Home = () => {
               <div className="grid md:grid-cols-4 gap-8">
                 <StatsCard icon="fa-users" number="1500+" label="Clients Satisfaits" />
                 <StatsCard icon="fa-file-signature" number="48h" label="Délai de Réponse" />
-                <StatsCard icon="fa-euro-sign" number="50M€" label="Financés en 2024" />
+                <StatsCard icon="fa-euro-sign" number="50M€" label="Financés en 2025" />
                 <StatsCard icon="fa-handshake" number="98%" label="Taux d'Accord" />
               </div>
             </ScrollReveal>
@@ -75,12 +80,12 @@ const Home = () => {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-primary mb-4">Simulez votre financement en temps réel</h2>
-              <p className="text-xl text-gray-600">Obtenez instantanément une estimation de vos mensualités</p>
+              <h2 className="text-2xl sm:text-4xl font-bold text-primary mb-4">Simulez votre financement en temps réel</h2>
+              <p className="text-base sm:text-xl text-gray-600">Obtenez instantanément une estimation de vos mensualités</p>
             </div>
             
             <ScrollReveal>
-            <div className="max-w-4xl mx-auto bg-gradient-to-br from-gray-50 to-indigo-50 rounded-3xl shadow-2xl p-10 border border-gray-200">
+            <div className="max-w-4xl mx-auto bg-gradient-to-br from-gray-50 to-indigo-50 rounded-3xl shadow-2xl p-6 sm:p-10 border border-gray-200">
               <div className="grid md:grid-cols-2 gap-8 mb-8">
                 <div className="space-y-4">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Montant du financement</label>
@@ -123,7 +128,7 @@ const Home = () => {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <div className="text-sm text-gray-600 mb-1">Votre mensualité estimée</div>
-                    <div className="text-5xl font-bold text-primary">{monthlyPayment.toLocaleString()} €</div>
+                    <div className="text-3xl sm:text-5xl font-bold text-primary">{monthlyPayment.toLocaleString()} €</div>
                     <div className="text-sm text-gray-500 mt-2">*Estimation indicative hors assurance</div>
                   </div>
                   <div className="text-right">
@@ -133,7 +138,7 @@ const Home = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <div className="text-xs text-gray-600 mb-1">Coût total</div>
                     <div className="text-lg font-bold text-gray-900">{totalCost.toLocaleString()} €</div>
@@ -148,7 +153,19 @@ const Home = () => {
                   </div>
                 </div>
                 
-                <Link to="/contact" className="btn-primary w-full flex items-center justify-center space-x-2">
+                <Link
+                  to="/contact"
+                  state={{
+                    fromSimulator: {
+                      amount,
+                      duration,
+                      monthlyPayment,
+                      totalCost,
+                      interestRate
+                    }
+                  }}
+                  className="btn-primary w-full flex items-center justify-center space-x-2"
+                >
                   <span>Faire une demande de financement</span>
                   <i className="fa-solid fa-arrow-right"></i>
                 </Link>
@@ -174,6 +191,61 @@ const Home = () => {
                   <SectorCard sector={sector} />
                 </ScrollReveal>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Assurance Section */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-gradient-to-br from-accent/10 via-white to-secondary/10 rounded-3xl p-8 sm:p-12 border-2 border-accent/20">
+                <div className="grid lg:grid-cols-2 gap-12 items-center">
+                  <div>
+                    <div className="inline-block px-4 py-2 bg-accent/20 rounded-full mb-6">
+                      <span className="text-accent font-semibold text-sm">Assurance professionnelle</span>
+                    </div>
+                    <h2 className="text-2xl sm:text-4xl font-bold text-primary mb-6">
+                      Protégez votre entreprise avec nos solutions d'assurance
+                    </h2>
+                    <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                      RC Pro, D&O, flotte automobile, multirisque... Un interlocuteur unique pour financer vos équipements <strong>et</strong> assurer votre activité. Devis personnalisé sous 48h.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Link to="/assurance" className="btn-primary inline-flex items-center space-x-2">
+                        <i className="fa-solid fa-shield-halved"></i>
+                        <span>Découvrir nos assurances</span>
+                      </Link>
+                      <Link to="/contact" className="btn-outline inline-flex items-center space-x-2">
+                        <span>Demander un devis</span>
+                        <i className="fa-solid fa-arrow-right"></i>
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 shadow-md border border-gray-100">
+                      <i className="fa-solid fa-shield-halved text-accent text-2xl mb-3"></i>
+                      <div className="font-bold text-primary">RC Pro</div>
+                      <div className="text-sm text-gray-600">Responsabilité civile</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                      <i className="fa-solid fa-user-tie text-secondary text-2xl mb-3"></i>
+                      <div className="font-bold text-primary">D&O</div>
+                      <div className="text-sm text-gray-600">Dirigeants</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                      <i className="fa-solid fa-truck text-accent text-2xl mb-3"></i>
+                      <div className="font-bold text-primary">Flotte</div>
+                      <div className="text-sm text-gray-600">Véhicules pro</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                      <i className="fa-solid fa-building text-secondary text-2xl mb-3"></i>
+                      <div className="font-bold text-primary">Multirisque</div>
+                      <div className="text-sm text-gray-600">Locaux & équipements</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -403,7 +475,7 @@ const Home = () => {
                 <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <i className="fa-solid fa-euro-sign text-indigo-600 text-2xl"></i>
                 </div>
-                <div className="text-3xl font-bold text-primary mb-2">2.5M€</div>
+                <div className="text-3xl font-bold text-primary mb-2">50M€</div>
                 <div className="text-gray-600">Financements accordés</div>
               </div>
               <div className="bg-white rounded-2xl p-6 shadow-lg text-center">

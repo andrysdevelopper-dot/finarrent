@@ -10,6 +10,7 @@ const FooterNav = () => {
           <li><Link to="/solutions/credit-bail" className="text-white/60 hover:text-white transition-colors">Crédit-bail</Link></li>
           <li><Link to="/solutions/loa" className="text-white/60 hover:text-white transition-colors">LOA</Link></li>
           <li><Link to="/solutions/credit-pro" className="text-white/60 hover:text-white transition-colors">Crédit Pro</Link></li>
+          <li><Link to="/assurance" className="text-white/60 hover:text-white transition-colors font-medium">Assurance Pro</Link></li>
           <li><Link to="/solutions/leasing-operationnel" className="text-white/60 hover:text-white transition-colors">Leasing Ops</Link></li>
           <li><Link to="/solutions/lld" className="text-white/60 hover:text-white transition-colors">LLD</Link></li>
         </ul>

@@ -1,31 +1,75 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import SEO from '../components/utils/SEO';
 import emailjs from '@emailjs/browser';
 import { emailJSConfig } from '../config/emailjs';
 import { validateForm } from '../utils/validation';
 import PageTransition from '../components/animations/PageTransition';
 import ScrollReveal from '../components/animations/ScrollReveal';
+import FAQItem from '../components/ui/FAQItem';
+
+// Map numeric amount to contact form select value
+const getAmountOption = (amount) => {
+  if (!amount || amount < 3000) return '';
+  if (amount <= 10000) return '3 000€ - 10 000€';
+  if (amount <= 30000) return '10 000€ - 30 000€';
+  if (amount <= 50000) return '30 000€ - 50 000€';
+  if (amount <= 100000) return '50 000€ - 100 000€';
+  if (amount <= 200000) return '100 000€ - 200 000€';
+  if (amount <= 500000) return '200 000€ - 500 000€';
+  return 'Plus de 500 000€';
+};
 
 const Contact = () => {
+  const location = useLocation();
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  const simulatorData = location.state?.fromSimulator;
+  const fromInsurance = location.state?.fromInsurance;
+
   const [formData, setFormData] = useState({
+    requestType: 'financement',
     companyName: '',
     siren: '',
     sector: '',
     amount: '',
+    equipmentType: '',
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    message: ''
+    message: '',
+    consent: false,
+    website: '' // Honeypot - doit rester vide (anti-spam)
   });
 
   const [errors, setErrors] = useState({});
+
+  // Pre-fill from Insurance page - set request type to assurance
+  useEffect(() => {
+    if (fromInsurance) {
+      setFormData(prev => ({ ...prev, requestType: 'assurance' }));
+    }
+  }, [fromInsurance]);
+
+  // Pre-fill from Simulator when arriving from /simulator
+  useEffect(() => {
+    if (simulatorData?.amount) {
+      const simulationMsg = `Simulation : ${simulatorData.amount.toLocaleString()}€ sur ${simulatorData.duration} mois - Mensualité estimée : ${simulatorData.monthlyPayment?.toLocaleString()}€`;
+      setFormData(prev => ({
+        ...prev,
+        requestType: 'financement',
+        amount: getAmountOption(simulatorData.amount),
+        message: prev.message || simulationMsg
+      }));
+    }
+  }, [simulatorData]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -33,11 +77,17 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate form
-    const requiredFields = ['companyName', 'siren', 'sector', 'amount', 'firstName', 'lastName', 'email', 'phone'];
+
+    // Honeypot : si rempli = bot
+    if (formData.website) {
+      setSubmitStatus('success'); // Faux succès pour ne pas alerter le bot
+      return;
+    }
+
+    // Validation
+    const requiredFields = ['companyName', 'siren', 'sector', 'amount', 'firstName', 'lastName', 'email', 'phone', 'consent'];
     const validation = validateForm(formData, requiredFields);
-    
+
     if (!validation.isValid) {
       setErrors(validation.errors);
       return;
@@ -45,37 +95,50 @@ const Contact = () => {
 
     setIsSubmitting(true);
     setSubmitStatus(null);
+    setErrors({});
 
     try {
-      // Send email using EmailJS
+      // reCAPTCHA v3 - protection anti-spam
+      let recaptchaToken = '';
+      if (executeRecaptcha) {
+        recaptchaToken = await executeRecaptcha('contact_form');
+      }
+
       await emailjs.send(
         emailJSConfig.serviceId,
         emailJSConfig.templateId,
         {
           to_name: 'Équipe Finassur',
           from_name: `${formData.firstName} ${formData.lastName}`,
+          request_type: formData.requestType === 'financement' ? 'Demande de financement' : 'Demande d\'assurance',
           company_name: formData.companyName,
           siren: formData.siren,
           sector: formData.sector,
           amount: formData.amount,
+          equipment_type: formData.equipmentType || 'Non précisé',
           email: formData.email,
           phone: formData.phone,
-          message: formData.message || 'Aucun message supplémentaire'
+          message: formData.message || 'Aucun message supplémentaire',
+          recaptcha_token: recaptchaToken
         },
         emailJSConfig.publicKey
       );
 
       setSubmitStatus('success');
       setFormData({
+        requestType: 'financement',
         companyName: '',
         siren: '',
         sector: '',
         amount: '',
+        equipmentType: '',
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
-        message: ''
+        message: '',
+        consent: false,
+        website: ''
       });
     } catch (error) {
       console.error('Error sending email:', error);
@@ -87,6 +150,10 @@ const Contact = () => {
 
   return (
     <PageTransition>
+      <SEO
+        title="Contact"
+        description="Contactez Finassur pour votre demande de financement professionnel. Formulaire sécurisé, réponse sous 48h."
+      />
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-32 pb-20 bg-gradient-to-br from-gray-50 via-white to-indigo-50">
@@ -193,8 +260,38 @@ const Contact = () => {
 
                 {/* Right Column - Form */}
                 <ScrollReveal delay={0.2}>
-                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-2xl p-8 border border-gray-200">
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-gray-200">
                     <form onSubmit={handleSubmit} className="space-y-6">
+                      {/* Honeypot - invisible aux utilisateurs */}
+                      <div className="absolute -left-[9999px] opacity-0" aria-hidden="true">
+                        <label htmlFor="website">Ne pas remplir</label>
+                        <input
+                          type="text"
+                          id="website"
+                          name="website"
+                          value={formData.website}
+                          onChange={handleChange}
+                          tabIndex="-1"
+                          autoComplete="off"
+                        />
+                      </div>
+
+                      {/* Type de demande */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Type de demande *
+                        </label>
+                        <select
+                          name="requestType"
+                          value={formData.requestType}
+                          onChange={handleChange}
+                          className="input-field"
+                        >
+                          <option value="financement">Financement (crédit-bail, LOA, crédit pro)</option>
+                          <option value="assurance">Assurance professionnelle</option>
+                        </select>
+                      </div>
+
                       {/* Company Info */}
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -270,8 +367,29 @@ const Contact = () => {
                         {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
                       </div>
 
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Type d'équipement
+                        </label>
+                        <select
+                          name="equipmentType"
+                          value={formData.equipmentType}
+                          onChange={handleChange}
+                          className="input-field"
+                        >
+                          <option value="">Sélectionnez le type d'équipement</option>
+                          <option value="vehicule">Véhicule / Flotte</option>
+                          <option value="informatique">Matériel informatique</option>
+                          <option value="medical">Équipement médical</option>
+                          <option value="btp">Matériel BTP / Engins</option>
+                          <option value="industriel">Machines industrielles</option>
+                          <option value="bureau">Mobilier de bureau</option>
+                          <option value="autre">Autre</option>
+                        </select>
+                      </div>
+
                       {/* Personal Info */}
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Prénom *
@@ -379,16 +497,58 @@ const Contact = () => {
                         </div>
                       )}
 
-                      <p className="text-xs text-gray-500 text-center">
-                        En soumettant ce formulaire, vous acceptez notre{' '}
-                        <a href="#" className="text-secondary hover:underline">
-                          politique de confidentialité
-                        </a>
-                        .
-                      </p>
+                      {/* Consentement RGPD - obligatoire */}
+                      <div className="flex items-start space-x-3">
+                        <input
+                          type="checkbox"
+                          id="consent"
+                          name="consent"
+                          checked={formData.consent}
+                          onChange={handleChange}
+                          className={`mt-1 h-4 w-4 rounded border-gray-300 text-secondary focus:ring-secondary ${errors.consent ? 'border-red-500' : ''}`}
+                        />
+                        <label htmlFor="consent" className="text-sm text-gray-600">
+                          J'accepte que mes données soient traitées conformément à la{' '}
+                          <Link to="/privacy" className="text-secondary hover:underline font-medium">
+                            politique de confidentialité
+                          </Link>
+                          {' '}pour traiter ma demande. *
+                        </label>
+                      </div>
+                      {errors.consent && <p className="text-red-500 text-sm">{errors.consent}</p>}
                     </form>
                   </div>
                 </ScrollReveal>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+          <div className="container mx-auto px-6">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-primary mb-4">Questions fréquentes</h2>
+                <p className="text-xl text-gray-600">Retrouvez les réponses aux questions les plus courantes</p>
+              </div>
+              <div className="space-y-4">
+                <FAQItem
+                  question="Quel est le délai de réponse pour une demande de financement ?"
+                  answer="Nous nous engageons à vous donner une réponse de principe sous 48h ouvrées. Une fois votre dossier complet, la validation définitive intervient généralement sous 5 à 7 jours."
+                />
+                <FAQItem
+                  question="Ai-je besoin d'un apport pour financer mon équipement ?"
+                  answer="Non, le crédit-bail et la LOA permettent de financer 100% du montant de votre équipement sans apport initial. Cela préserve votre trésorerie pour d'autres investissements."
+                />
+                <FAQItem
+                  question="Quels types d'équipements puis-je financer ?"
+                  answer="Nous finançons tous types d'équipements professionnels : véhicules, matériel informatique, machines industrielles, équipements médicaux, matériel BTP, etc. De 3 000€ à 500 000€."
+                />
+                <FAQItem
+                  question="La simulation est-elle engageante ?"
+                  answer="Non, la simulation en ligne est totalement gratuite et sans engagement. Elle vous donne une estimation indicative. Seule une étude personnalisée de votre dossier aboutira à une offre ferme."
+                />
               </div>
             </div>
           </div>

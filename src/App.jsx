@@ -3,9 +3,36 @@ import { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
-// ... other imports ...
+import Home from './pages/Home';
+import Solutions from './pages/Solutions';
+import SolutionDetail from './pages/SolutionDetail';
+import Sectors from './pages/Sectors';
+import SectorDetail from './pages/SectorDetail';
+import WhyLeasing from './pages/WhyLeasing';
+import Process from './pages/Process';
+import Testimonials from './pages/Testimonials';
+import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
+import Simulator from './pages/Simulator';
+import Contact from './pages/Contact';
+import Legal from './pages/Legal';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import About from './pages/About';
+import FAQ from './pages/FAQ';
+import Insurance from './pages/Insurance';
+import NotFound from './pages/NotFound';
 
-// ... ScrollToTop component ...
+// Scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 function App() {
   const location = useLocation();
@@ -29,6 +56,13 @@ function App() {
             <Route path="/blog/:id" element={<BlogDetail />} />
             <Route path="/simulator" element={<Simulator />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/legal" element={<Legal />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/assurance" element={<Insurance />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
       </main>
@@ -36,6 +70,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;

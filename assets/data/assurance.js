@@ -1,0 +1,38 @@
+export const assuranceTypes = [
+  {
+    id: 'rc-pro',
+    title: 'RC Professionnelle',
+    icon: 'fa-shield-halved',
+    color: 'from-secondary to-indigo-600',
+    description: 'Protégez votre entreprise contre les dommages causés à des tiers dans le cadre de votre activité professionnelle.',
+    advantages: ['Dommages corporels et matériels', 'Dommages immatériels', 'Recours des tiers', 'Défense pénale'],
+    idealFor: ['Professions libérales', 'PME', 'Artisans', 'Commerçants'],
+  },
+  {
+    id: 'do',
+    title: 'D&O (Dirigeants & Cadres)',
+    icon: 'fa-user-tie',
+    color: 'from-accent to-emerald-600',
+    description: 'Assurance responsabilité civile des dirigeants et mandataires sociaux pour les erreurs de gestion.',
+    advantages: ['Protection personnelle', 'Erreurs de gestion', 'Manquements aux obligations', 'Risques de mise en cause'],
+    idealFor: ['Dirigeants', 'Associés', 'Cadres à responsabilités', 'Administrateurs'],
+  },
+  {
+    id: 'flotte',
+    title: 'Flotte automobile',
+    icon: 'fa-truck',
+    color: 'from-orange-500 to-orange-600',
+    description: 'Assurance multivehicules pour vos véhicules professionnels : voitures, utilitaires, camions.',
+    advantages: ['Tarification groupée', 'Gestion simplifiée', 'Tous risques ou tiers', 'Assistance 24/7'],
+    idealFor: ['Flottes commerciales', 'Livraison', 'Véhicules de société', 'Artisans'],
+  },
+  {
+    id: 'multirisque',
+    title: 'Multirisque professionnel',
+    icon: 'fa-building',
+    color: 'from-purple-500 to-purple-600',
+    description: 'Protection globale de vos locaux, équipements et stocks contre incendie, vol, dégâts des eaux.',
+    advantages: ['Locaux et équipements', 'Stocks et marchandises', 'Perte d\'exploitation', 'Contenu informatique'],
+    idealFor: ['Bureaux', 'Entrepôts', 'Commerces', 'Industries'],
+  },
+];

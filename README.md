@@ -1,14 +1,13 @@
 # Finassur - Plateforme de Financement Professionnel
 
-Application React complète pour Finassur, spécialisée dans le financement professionnel (crédit-bail, LOA, solutions de financement).
+Application **Next.js 15** pour Finassur, spécialisée dans le financement professionnel (crédit-bail, LOA, solutions de financement).
 
 ## 🚀 Technologies Utilisées
 
-- **React 19** - Framework JavaScript
-- **Vite** - Build tool et dev server
-- **React Router DOM** - Navigation multi-pages
+- **Next.js 15** - Framework React avec App Router
+- **React 18** - Bibliothèque UI
 - **TailwindCSS v4** - Framework CSS
-- **Auth0** - Authentification
+- **Auth0** - Authentification (préparé, voir AUTH0_SETUP.md)
 - **EmailJS** - Envoi d'emails
 - **Font Awesome** - Icônes
 
@@ -34,18 +33,21 @@ npm install
 Créez un fichier `.env` à la racine du projet en vous basant sur `.env.example`:
 
 ```env
-# Auth0 Configuration
-VITE_AUTH0_DOMAIN=your-domain.auth0.com
-VITE_AUTH0_CLIENT_ID=your_client_id
+# Auth0 (Next.js)
+AUTH0_DOMAIN=your-tenant.auth0.com
+AUTH0_CLIENT_ID=your_client_id
+AUTH0_CLIENT_SECRET=your_client_secret
+AUTH0_SECRET=run_openssl_rand_hex_32
+APP_BASE_URL=http://localhost:3000
 
-# EmailJS Configuration
-VITE_EMAILJS_SERVICE_ID=your_service_id
-VITE_EMAILJS_TEMPLATE_ID=your_template_id
-VITE_EMAILJS_TEMPLATE_NEWSLETTER=your_newsletter_template_id
-VITE_EMAILJS_PUBLIC_KEY=your_public_key
+# EmailJS
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_NEWSLETTER=your_newsletter_template_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
 
-# reCAPTCHA v3 (anti-spam)
-VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+# reCAPTCHA v3
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 ```
 
 ### Configuration Auth0
@@ -53,9 +55,9 @@ VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 1. Créez un compte sur [Auth0](https://auth0.com/)
 2. Créez une nouvelle application (Single Page Application)
 3. Configurez les URLs autorisées:
-   - Allowed Callback URLs: `http://localhost:5173`
-   - Allowed Logout URLs: `http://localhost:5173`
-   - Allowed Web Origins: `http://localhost:5173`
+- Allowed Callback URLs: `http://localhost:3000/api/auth/callback`
+  - Allowed Logout URLs: `http://localhost:3000`
+  - Allowed Web Origins: `http://localhost:3000`
 4. Copiez le Domain et Client ID dans votre fichier `.env`
 
 ### Configuration EmailJS
@@ -82,7 +84,7 @@ VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 npm run dev
 ```
 
-L'application sera accessible sur `http://localhost:5173`
+L'application sera accessible sur `http://localhost:3000`
 
 ### Build de Production
 
@@ -102,31 +104,23 @@ npm run preview
 
 ```
 finassur/
-├── src/
-│   ├── assets/
-│   │   └── data/          # Données statiques (sectors, testimonials, solutions, blog)
-│   ├── components/
-│   │   ├── layout/        # Header, Footer
-│   │   └── ui/            # Composants réutilisables (Cards, etc.)
-│   ├── config/            # Configuration Auth0 et EmailJS
-│   ├── hooks/             # Custom hooks (useFinancingCalculator, useScrollEffect)
-│   ├── pages/             # Pages de l'application
-│   │   ├── Home.jsx
-│   │   ├── Solutions.jsx
-│   │   ├── Sectors.jsx
-│   │   ├── WhyLeasing.jsx
-│   │   ├── Process.jsx
-│   │   ├── Testimonials.jsx
-│   │   ├── Blog.jsx
-│   │   ├── Simulator.jsx
-│   │   └── Contact.jsx
-│   ├── utils/             # Utilitaires (validation, etc.)
-│   ├── App.jsx            # Composant principal avec routing
-│   ├── main.jsx           # Point d'entrée
-│   └── index.css          # Styles globaux et configuration Tailwind
-├── templates/             # Templates HTML originaux (référence)
-├── public/                # Assets statiques
-└── index.html             # HTML principal
+├── app/                   # Next.js App Router
+│   ├── layout.jsx        # Layout racine
+│   ├── page.jsx          # Page d'accueil
+│   ├── api/auth/         # Routes Auth0
+│   ├── solutions/        # Pages solutions
+│   ├── sectors/          # Pages secteurs
+│   ├── blog/             # Pages blog
+│   └── ...
+├── components/           # Composants réutilisables
+│   ├── layout/           # Header, Footer
+│   ├── ui/               # Cards, etc.
+│   └── pages/            # Composants de pages (client)
+├── assets/data/          # Données statiques
+├── hooks/                # Custom hooks
+├── utils/                # Utilitaires
+├── public/               # Assets statiques
+└── next.config.js
 ```
 
 ## 🎨 Pages Disponibles

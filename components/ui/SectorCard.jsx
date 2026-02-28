@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function SectorCard({ sector }) {
   return (
-    <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-secondary cursor-pointer">
+    <div id={sector.id} className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-secondary cursor-pointer">
       <div className={`w-16 h-16 bg-gradient-to-br ${sector.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
         <i className={`fa-solid ${sector.icon} text-white text-3xl`}></i>
       </div>

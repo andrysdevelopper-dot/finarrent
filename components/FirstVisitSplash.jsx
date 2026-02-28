@@ -27,7 +27,7 @@ export default function FirstVisitSplash({ children }) {
 
   useEffect(() => {
     if (showSplash !== true) return;
-    const timer = setTimeout(() => setPhase('choice'), 2200);
+    const timer = setTimeout(() => setPhase('choice'), 1200);
     return () => clearTimeout(timer);
   }, [showSplash]);
 

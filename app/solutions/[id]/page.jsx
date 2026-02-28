@@ -15,31 +15,37 @@ export default function SolutionDetailPage({ params }) {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative pt-28 pb-16 sm:pt-32 sm:pb-24 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white to-secondary/5" />
-        <div className="absolute top-20 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent/10 rounded-full blur-3xl translate-y-1/2" />
-        <div className="container mx-auto px-6 relative">
+      <section className="relative pt-28 pb-16 sm:pt-40 sm:pb-32 overflow-hidden bg-[#0A192F] text-white">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-secondary/15 rounded-full blur-[120px] animate-pulse-slow"></div>
+          <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-accent/15 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-10">
           <Link
             href="/solutions"
-            className="inline-flex items-center gap-2 text-secondary hover:text-secondary/80 font-medium mb-8 transition-colors group"
+            className="inline-flex items-center gap-2 text-white/60 hover:text-white font-bold mb-12 transition-all group"
           >
-            <i className="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform" />
+            <i className="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform" />
             Retour aux solutions
           </Link>
-          <div className="max-w-3xl">
-            <div className={`inline-flex w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${sol.color} rounded-2xl items-center justify-center mb-6 shadow-lg shadow-secondary/20`}>
-              <i className={`fa-solid ${sol.icon} text-white text-2xl sm:text-3xl`} />
+          <div className="max-w-4xl">
+            <div className={`inline-flex w-20 h-20 bg-gradient-to-br ${sol.color} rounded-[24px] items-center justify-center mb-10 shadow-2xl shadow-black/20 animate-float`}>
+              <i className={`fa-solid ${sol.icon} text-white text-3xl`} />
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-4 tracking-tight">{sol.title}</h1>
-            <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed">{sol.description}</p>
-            <div className="flex flex-wrap gap-3">
-              <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-xl border-2 border-secondary/30 text-secondary font-semibold shadow-sm">
-                <i className="fa-solid fa-clock text-sm" />
-                Durée : {sol.duration}
+            <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-tight leading-tight">
+              {sol.title}
+            </h1>
+            <p className="text-xl sm:text-2xl text-white/70 mb-12 leading-relaxed font-light max-w-3xl">
+              {sol.description}
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <span className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 text-white font-bold shadow-xl">
+                <i className="fa-solid fa-clock text-accent" />
+                Délai : {sol.duration}
               </span>
-              <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-xl border-2 border-accent/30 text-accent font-semibold shadow-sm">
-                <i className="fa-solid fa-euro-sign text-sm" />
+              <span className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 text-white font-bold shadow-xl">
+                <i className="fa-solid fa-euro-sign text-accent" />
                 {sol.minAmount} - {sol.maxAmount}
               </span>
             </div>

@@ -12,20 +12,8 @@ export default function SimulatorClient() {
   const { amount, setAmount, duration, setDuration, monthlyPayment, totalCost, totalInterest, interestRate } = useFinancingCalculator();
   const contactUrl = `/contact?fromSimulator=1&amount=${amount}&duration=${duration}&monthlyPayment=${monthlyPayment}&totalCost=${totalCost}`;
 
-  const handleDemandeClick = async () => {
-    setIsChecking(true);
-    try {
-      const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        router.push(contactUrl);
-      } else {
-        window.location.href = `/api/auth/login?returnTo=${encodeURIComponent(contactUrl)}`;
-      }
-    } catch {
-      window.location.href = `/api/auth/login?returnTo=${encodeURIComponent(contactUrl)}`;
-    } finally {
-      setIsChecking(false);
-    }
+  const handleDemandeClick = () => {
+    router.push(contactUrl);
   };
 
   return (

@@ -115,32 +115,77 @@ export default function DemandesClient() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-mono font-bold text-secondary">{d.reference}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_LABELS[d.status]?.color || 'bg-gray-100'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${STATUS_LABELS[d.status]?.color || 'bg-gray-100'}`}>
                     {STATUS_LABELS[d.status]?.label || d.status}
                   </span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter">
                     {REQUEST_TYPE_LABELS[d.requestType] || d.requestType}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-primary">{d.companyName}</h3>
-                <p className="text-sm text-gray-600">
-                  {d.firstName} {d.lastName} • {d.email} • {d.phone}
-                </p>
+                <h3 className="text-lg font-black text-primary uppercase">{d.companyName}</h3>
+                <div className="flex flex-col gap-1 mt-1 text-sm text-gray-500 font-medium">
+                  <div className="flex items-center gap-2">
+                    <i className="fa-solid fa-user-tie text-[10px] opacity-40"></i>
+                    {d.firstName} {d.lastName}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <i className="fa-solid fa-envelope text-[10px] opacity-40"></i>
+                    {d.email}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <i className="fa-solid fa-phone text-[10px] opacity-40"></i>
+                    {d.phone}
+                  </div>
+                </div>
               </div>
-              <div className="text-right text-sm text-gray-500">
-                {formatDate(d.createdAt)}
+              <div className="text-right">
+                <div className="text-sm font-black text-primary">{formatDate(d.createdAt)}</div>
+                {d.user ? (
+                   <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-700 text-[10px] font-black rounded-lg border border-green-100 mt-2">
+                    <i className="fa-solid fa-circle-check"></i>
+                    CLIENT AUTHENTIFIÉ
+                   </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-gray-50 text-gray-400 text-[10px] font-black rounded-lg border border-gray-100 mt-2">
+                    <i className="fa-solid fa-ghost"></i>
+                    PROSPECT ANONYME
+                   </span>
+                )}
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4 text-sm">
-              <div><span className="text-gray-500">SIREN:</span> {d.siren}</div>
-              <div><span className="text-gray-500">Secteur:</span> {d.sector}</div>
-              <div><span className="text-gray-500">Montant:</span> {d.amount}</div>
-              <div><span className="text-gray-500">Équipement:</span> {d.equipmentType || '-'}</div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+              <div><div className="text-[10px] font-black text-gray-400 uppercase">SIREN</div> <div className="font-bold text-primary">{d.siren}</div></div>
+              <div><div className="text-[10px] font-black text-gray-400 uppercase">Secteur</div> <div className="font-bold text-primary">{d.sector}</div></div>
+              <div><div className="text-[10px] font-black text-gray-400 uppercase">Montant</div> <div className="font-bold text-secondary italic">{d.amount}</div></div>
+              <div><div className="text-[10px] font-black text-gray-400 uppercase">Équipement</div> <div className="font-bold text-primary">{d.equipmentType || '-'}</div></div>
             </div>
+
+            {/* Documents Section */}
+            {d.documents?.length > 0 && (
+              <div className="mb-6">
+                <div className="text-[10px] font-black text-gray-400 uppercase mb-3">Pièces jointes ({d.documents.length})</div>
+                <div className="flex flex-wrap gap-3">
+                  {d.documents.map(doc => (
+                    <a 
+                      key={doc.id} 
+                      href={doc.path} 
+                      target="_blank" 
+                      className="flex items-center gap-3 px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:border-secondary hover:shadow-sm transition-all text-sm group"
+                    >
+                      <i className="fa-solid fa-file-pdf text-red-500 text-base"></i>
+                      <span className="font-bold text-primary group-hover:text-secondary">{doc.originalName}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {d.message && (
-              <p className="text-sm text-gray-600 mb-4 p-3 bg-gray-50 rounded-lg">{d.message}</p>
+              <div className="mb-6">
+                 <div className="text-[10px] font-black text-gray-400 uppercase mb-2">Message prospect</div>
+                 <p className="text-sm text-gray-600 p-4 bg-white border border-gray-100 rounded-2xl italic">"{d.message}"</p>
+              </div>
             )}
 
             <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-100">

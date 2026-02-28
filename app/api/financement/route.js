@@ -4,6 +4,8 @@ import { generateReference } from '@/lib/reference';
 import { verifyRecaptcha } from '@/lib/recaptcha';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { validateEmail, validatePhone, validateSIREN } from '@/utils/validation';
+import { getSession } from '@auth0/nextjs-auth0';
+import { syncUser } from '@/lib/users';
 
 const AMOUNTS = [
   '3 000€ - 10 000€',
@@ -85,6 +87,13 @@ export async function POST(request) {
     }
 
     const body = await request.json();
+    const session = await getSession();
+    let userId = null;
+
+    if (session?.user) {
+      const dbUser = await syncUser(session.user);
+      userId = dbUser?.id;
+    }
 
     const errors = validateBody(body);
     if (Object.keys(errors).length > 0) {
@@ -138,6 +147,7 @@ export async function POST(request) {
         message: body.message?.trim() || null,
         ipAddress: ip !== 'unknown' ? ip : null,
         userAgent: request.headers.get('user-agent')?.slice(0, 500) || null,
+        userId: userId,
       },
     });
 

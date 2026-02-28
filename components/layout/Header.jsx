@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const pathname = usePathname();
+  const { user, isLoading } = useUser();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -86,12 +88,30 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Link href="/espace" className={`hidden sm:flex items-center space-x-2 px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold rounded-lg border-2 transition-all duration-300 ${
-              isOverDarkHero ? 'border-white/80 text-white hover:bg-white/10' : 'border-secondary text-secondary hover:bg-secondary hover:text-white'
-            }`}>
-              <i className="fa-solid fa-user"></i>
-              <span>Accéder à mon espace</span>
-            </Link>
+            {user ? (
+              <Link href="/espace" className={`hidden sm:flex items-center space-x-3 px-4 py-2 rounded-xl transition-all duration-300 group border border-transparent ${
+                isOverDarkHero ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-50 hover:bg-gray-100 text-primary'
+              }`}>
+                {user.picture ? (
+                  <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border-2 border-accent/20" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent">
+                    <i className="fa-solid fa-user"></i>
+                  </div>
+                )}
+                <div className="text-left hidden xl:block">
+                  <div className="text-xs font-bold leading-tight line-clamp-1">{user.name}</div>
+                  <div className={`text-[10px] opacity-70 ${isOverDarkHero ? 'text-white' : 'text-gray-500'}`}>Mon Dashboard</div>
+                </div>
+              </Link>
+            ) : (
+              <Link href="/api/auth/login" className={`hidden sm:flex items-center space-x-2 px-6 py-2.5 text-sm font-bold rounded-xl border-2 transition-all duration-300 ${
+                isOverDarkHero ? 'border-white/80 text-white hover:bg-white/10' : 'border-secondary text-secondary hover:bg-secondary hover:text-white'
+              }`}>
+                <i className="fa-solid fa-user"></i>
+                <span>Accéder à mon espace</span>
+              </Link>
+            )}
             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className={`lg:hidden ${isOverDarkHero ? 'text-white' : 'text-gray-700'}`} aria-label="Menu">
               <i className={`fa-solid ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-2xl`}></i>
             </button>
@@ -107,10 +127,20 @@ export default function Header() {
               <Link href="/why-leasing" className={`block font-medium ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`} onClick={() => setIsMobileMenuOpen(false)}>Pourquoi Finassur</Link>
               <Link href="/blog" className={`block font-medium ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`} onClick={() => setIsMobileMenuOpen(false)}>Actualités</Link>
               <Link href="/contact" className={`block font-medium ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-gray-700 hover:text-secondary'}`} onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
-              <Link href="/espace" className={`flex items-center space-x-2 font-semibold ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-secondary hover:text-secondary/80'}`} onClick={() => setIsMobileMenuOpen(false)}>
-                <i className="fa-solid fa-user"></i>
-                <span>Accéder à mon espace</span>
-              </Link>
+              {user ? (
+                <Link href="/espace" className={`flex items-center space-x-3 p-3 rounded-xl ${isOverDarkHero ? 'bg-white/10 text-white' : 'bg-gray-50 text-primary'}`} onClick={() => setIsMobileMenuOpen(false)}>
+                  <img src={user.picture} alt="" className="w-10 h-10 rounded-full" />
+                  <div>
+                    <div className="font-bold">{user.name}</div>
+                    <div className="text-xs opacity-70">Tableau de bord</div>
+                  </div>
+                </Link>
+              ) : (
+                <Link href="/api/auth/login" className={`flex items-center space-x-2 font-semibold ${isOverDarkHero ? 'text-white hover:text-white/90' : 'text-secondary hover:text-secondary/80'}`} onClick={() => setIsMobileMenuOpen(false)}>
+                  <i className="fa-solid fa-user"></i>
+                  <span>Accéder à mon espace</span>
+                </Link>
+              )}
             </div>
           </div>
         )}

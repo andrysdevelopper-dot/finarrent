@@ -10,7 +10,18 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./prisma/dev.db"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  auth0Id   String   @unique
+  email     String   @unique
+  name      String?
+  role      String   @default("client") // Roles: "client", "admin"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  demandes  DemandeFinancement[]
 }
 
 model DemandeFinancement {
@@ -33,4 +44,23 @@ model DemandeFinancement {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   adminNotes    String?
+  
+  // Relations
+  userId        String?
+  user          User?      @relation(fields: [userId], references: [id])
+  documents     Document[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String
+  path        String
+  mimeType    String?
+  type        String   @default("autre") // "kbis", "rib", "cni", "autre"
+  fileSize    Int?
+  createdAt   DateTime @default(now())
+  
+  demandeId   String
+  demande     DemandeFinancement @relation(fields: [demandeId], references: [id], onDelete: Cascade)
 }

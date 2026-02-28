@@ -1,11 +1,20 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { isAdmin, syncUser } from '@/lib/users';
 
 export default async function AdminLayout({ children }) {
   const session = await getSession();
   if (!session?.user) {
     redirect('/api/auth/login?returnTo=/admin/demandes');
+  }
+
+  // Synchronisation et vérification du rôle admin
+  await syncUser(session.user);
+  const adminAccess = await isAdmin(session.user);
+
+  if (!adminAccess) {
+    redirect('/espace'); // Rediriger les non-admins vers leur espace client
   }
 
   return (

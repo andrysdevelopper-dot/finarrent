@@ -1,5 +1,6 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { UserProvider } from '@auth0/nextjs-auth0/client';
 import './globals.css';
 
 export const metadata = {
@@ -17,15 +18,17 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
       <body>
-        <div className="min-h-screen flex flex-col">
-          <div id="site-header">
-            <Header />
+        <UserProvider>
+          <div className="min-h-screen flex flex-col">
+            <div id="site-header">
+              <Header />
+            </div>
+            <main className="flex-grow">{children}</main>
+            <footer id="site-footer">
+              <Footer />
+            </footer>
           </div>
-          <main className="flex-grow">{children}</main>
-          <footer id="site-footer">
-            <Footer />
-          </footer>
-        </div>
+        </UserProvider>
       </body>
     </html>
   );

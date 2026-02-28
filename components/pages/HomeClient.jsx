@@ -23,26 +23,46 @@ export default function HomeClient() {
     <PageTransition>
       <div className="min-h-screen">
         <Hero />
-        <section className="py-20 bg-white">
+        <section className="py-24 bg-white">
           <div className="container mx-auto px-6">
             <ScrollReveal>
-              <div className="grid md:grid-cols-4 gap-8">
-                <StatsCard icon="fa-users" number="1500+" label="Clients Satisfaits" />
-                <StatsCard icon="fa-file-signature" number="48h" label="Délai de Réponse" />
-                <StatsCard icon="fa-euro-sign" number="50M€" label="Financés en 2025" />
-                <StatsCard icon="fa-handshake" number="98%" label="Taux d'Accord" />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                  { icon: 'fa-users', num: '1500+', label: 'Clients Satisfaits', color: 'secondary' },
+                  { icon: 'fa-clock', num: '48h', label: 'Délai de Réponse', color: 'accent' },
+                  { icon: 'fa-euro-sign', num: '50M€', label: 'Financés en 2025', color: 'indigo-500' },
+                  { icon: 'fa-handshake-simple', num: '98%', label: 'Taux d\'Accord', color: 'orange-500' }
+                ].map((stat, i) => (
+                  <div key={i} className="group p-8 rounded-[32px] bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 text-center">
+                    <div className={`w-14 h-14 bg-${stat.color}/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform`}>
+                      <i className={`fa-solid ${stat.icon} text-${stat.color} text-2xl`}></i>
+                    </div>
+                    <div className="text-4xl font-black text-primary mb-2 tracking-tighter">{stat.num}</div>
+                    <div className="text-sm font-bold text-gray-500 uppercase tracking-widest">{stat.label}</div>
+                  </div>
+                ))}
               </div>
             </ScrollReveal>
           </div>
         </section>
 
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+        <section className="py-24 bg-[#F8FAFC]">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-primary mb-4">Nos secteurs d&apos;expertise</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">Des solutions de financement adaptées à chaque métier et chaque équipement professionnel</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+              <div className="max-w-2xl">
+                <div className="inline-block px-4 py-2 bg-accent/5 rounded-full mb-6 border border-accent/10">
+                  <span className="text-accent font-bold text-xs uppercase tracking-widest">Secteurs Financés</span>
+                </div>
+                <h2 className="text-4xl sm:text-5xl font-black text-primary leading-tight">
+                  Une expertise par <span className="text-accent">métier</span>
+                </h2>
+              </div>
+              <Link href="/sectors" className="text-secondary font-bold flex items-center gap-2 group">
+                Voir tous les secteurs 
+                <i className="fa-solid fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+              </Link>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {sectorsData.slice(0, 4).map((sector) => (
                 <ScrollReveal key={sector.id}><SectorCard sector={sector} /></ScrollReveal>
               ))}
@@ -92,66 +112,70 @@ export default function HomeClient() {
           </div>
         </section>
 
-        <section className="py-20 bg-white">
+        <section className="py-24 bg-white relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
           <div className="container mx-auto px-6">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <div className="inline-block px-4 py-2 bg-secondary/10 rounded-full mb-6">
-                  <span className="text-secondary font-semibold text-sm">Expertise financière</span>
-                </div>
-                <h2 className="text-4xl font-bold text-primary mb-6">Pourquoi choisir le leasing professionnel ?</h2>
-                <p className="text-xl text-gray-600 mb-8 leading-relaxed">Le crédit-bail et la location avec option d&apos;achat offrent des avantages fiscaux et financiers significatifs pour développer votre entreprise sans mobiliser votre trésorerie.</p>
-                <div className="space-y-6">
-                  {[
-                    { icon: 'fa-coins', bg: 'bg-accent/10', color: 'text-accent', title: 'Préservez votre trésorerie', desc: 'Financez vos équipements sans apport et conservez votre capacité d\'investissement.' },
-                    { icon: 'fa-chart-line', bg: 'bg-secondary/10', color: 'text-secondary', title: 'Avantages fiscaux optimisés', desc: 'Les loyers sont déductibles à 100% de votre résultat.' },
-                    { icon: 'fa-shield-halved', bg: 'bg-indigo-500/10', color: 'text-indigo-600', title: 'Flexibilité et maîtrise du budget', desc: 'Mensualités fixes adaptées à votre activité.' },
-                    { icon: 'fa-clock', bg: 'bg-orange-500/10', color: 'text-orange-600', title: 'Rapidité de mise en place', desc: 'Réponse de principe en 48h et déblocage sous 7 jours.' },
-                  ].map((item, i) => (
-                    <ScrollReveal key={i} delay={i * 0.1}>
-                      <div className="flex items-start space-x-4">
-                        <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                          <i className={`fa-solid ${item.icon} ${item.color} text-xl`}></i>
+            <div className="grid lg:grid-cols-2 gap-20 items-center">
+              <ScrollReveal scale={0.95}>
+                <div className="relative">
+                  <div className="absolute -inset-10 bg-accent/5 rounded-full blur-[100px] animate-pulse-slow"></div>
+                  <div className="relative bg-white rounded-[40px] p-2 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] border border-gray-100 group">
+                    <div className="relative overflow-hidden rounded-[36px] aspect-square">
+                      <img 
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000" 
+                        src="/solutions_leasing_concepts_1772271116670.png" 
+                        alt="Leasing Excellence" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                    
+                    {/* Floating Info Box */}
+                    <div className="absolute -bottom-4 -right-4 bg-white rounded-[24px] p-6 shadow-2xl border border-gray-50 transform group-hover:-translate-y-2 transition-transform duration-500 z-20">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                          <i className="fa-solid fa-chart-line text-secondary text-xl"></i>
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-primary mb-2">{item.title}</h3>
-                          <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+                          <div className="text-2xl font-black text-primary tracking-tighter">100%</div>
+                          <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">Déductible</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              <div className="space-y-10">
+                <div>
+                  <div className="inline-block px-4 py-2 bg-secondary/5 rounded-full mb-6 border border-secondary/10">
+                    <span className="text-secondary font-bold text-xs uppercase tracking-widest">Expertise Métier</span>
+                  </div>
+                  <h2 className="text-4xl sm:text-5xl font-black text-primary mb-6 leading-tight">
+                    Optimisez votre capital avec le <span className="text-secondary">leasing</span>
+                  </h2>
+                  <p className="text-lg text-gray-600 leading-relaxed font-light">
+                    Ne laissez pas l&apos;acquisition de matériel freiner votre élan. Financez vos projets tout en préservant votre trésorerie pour vos investissements stratégiques.
+                  </p>
+                </div>
+
+                <div className="grid gap-6">
+                  {[
+                    { icon: 'fa-coins', color: 'accent', title: 'Trésorerie Préservée', desc: 'Conservez vos fonds propres pour votre besoin en fonds de roulement.' },
+                    { icon: 'fa-file-invoice-dollar', color: 'secondary', title: 'Fiscalité Avantageuse', desc: 'Les loyers passent en charges d\'exploitation, réduisant votre IS.' },
+                    { icon: 'fa-arrows-rotate', color: 'indigo-500', title: 'Matériel à la Pointe', desc: 'Renouvelez facilement vos équipements en fin de contrat.' }
+                  ].map((item, i) => (
+                    <ScrollReveal key={i} delay={i * 0.1}>
+                      <div className="group flex items-center gap-6 p-6 rounded-3xl hover:bg-gray-50 transition-all duration-300 border border-transparent hover:border-gray-100">
+                        <div className={`w-14 h-14 bg-${item.color}/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                          <i className={`fa-solid ${item.icon} text-${item.color} text-2xl`}></i>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-primary mb-1 underline decoration-transparent group-hover:decoration-accent/30 transition-all">{item.title}</h3>
+                          <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
                         </div>
                       </div>
                     </ScrollReveal>
                   ))}
-                </div>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 to-accent/10 rounded-3xl blur-3xl"></div>
-                <div className="relative space-y-6">
-                  <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
-                    <div className="h-72 overflow-hidden rounded-xl mb-6">
-                      <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/00a4222416-9ecfd6053f8d692fbfb7.png" alt="Business handshake" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-xl p-4 text-center">
-                        <div className="text-3xl font-bold text-secondary mb-1">15+</div>
-                        <div className="text-sm text-gray-600">Années d&apos;expérience</div>
-                      </div>
-                      <div className="bg-gradient-to-br from-accent/5 to-accent/10 rounded-xl p-4 text-center">
-                        <div className="text-3xl font-bold text-accent mb-1">98%</div>
-                        <div className="text-sm text-gray-600">Clients satisfaits</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-r from-secondary to-accent rounded-2xl p-8 text-white shadow-xl">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i className="fa-solid fa-lightbulb text-white text-2xl"></i>
-                      </div>
-                      <div>
-                        <div className="font-bold text-lg">Conseil personnalisé</div>
-                        <div className="text-white/80 text-sm">Par nos experts en financement</div>
-                      </div>
-                    </div>
-                    <p className="text-white/90 leading-relaxed">Nos conseillers analysent votre situation et vous proposent la solution de financement la plus avantageuse pour votre entreprise.</p>
-                  </div>
                 </div>
               </div>
             </div>

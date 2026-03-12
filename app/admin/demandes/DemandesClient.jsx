@@ -5,8 +5,15 @@ import { useState, useEffect } from 'react';
 const STATUS_LABELS = {
   en_attente: { label: 'En attente', color: 'bg-amber-100 text-amber-800' },
   en_cours: { label: 'En cours', color: 'bg-blue-100 text-blue-800' },
+  documents_manquants: { label: 'Documents manquants', color: 'bg-orange-100 text-orange-800' },
+  devis_envoye: { label: 'Devis envoyé', color: 'bg-cyan-100 text-cyan-800' },
+  devis_accepte: { label: 'Devis accepté', color: 'bg-indigo-100 text-indigo-800' },
+  signature_en_attente: { label: 'Signature en attente', color: 'bg-purple-100 text-purple-800' },
+  signe: { label: 'Signé', color: 'bg-teal-100 text-teal-800' },
+  transmis: { label: 'Transmis', color: 'bg-sky-100 text-sky-800' },
   validee: { label: 'Validée', color: 'bg-green-100 text-green-800' },
   refusee: { label: 'Refusée', color: 'bg-red-100 text-red-800' },
+  finalise: { label: 'Finalisé', color: 'bg-emerald-100 text-emerald-800' },
 };
 
 const REQUEST_TYPE_LABELS = {
@@ -190,7 +197,7 @@ export default function DemandesClient() {
 
             <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-100">
               <span className="text-sm font-medium text-gray-700">Changer le statut :</span>
-              {['en_attente', 'en_cours', 'validee', 'refusee'].map((s) => (
+              {['en_attente', 'en_cours', 'documents_manquants', 'devis_envoye', 'devis_accepte', 'signature_en_attente', 'signe', 'transmis', 'validee', 'refusee', 'finalise'].map((s) => (
                 <button
                   key={s}
                   onClick={() => updateStatus(d.id, s)}

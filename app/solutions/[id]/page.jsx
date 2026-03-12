@@ -3,13 +3,15 @@ import { solutionsData } from '@/assets/data/solutions';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
-  const sol = solutionsData.find(s => s.id === params.id);
+  const { id } = await params;
+  const sol = solutionsData.find(s => s.id === id);
   if (!sol) return { title: 'Solution | Finassur' };
   return { title: `${sol.title} | Finassur`, description: sol.description };
 }
 
-export default function SolutionDetailPage({ params }) {
-  const sol = solutionsData.find(s => s.id === params.id);
+export default async function SolutionDetailPage({ params }) {
+  const { id } = await params;
+  const sol = solutionsData.find(s => s.id === id);
   if (!sol) notFound();
 
   return (

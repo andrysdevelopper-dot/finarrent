@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import emailjs from '@emailjs/browser';
-import { emailJSConfig } from '@/components/config/emailjs';
 
 export default function FooterNewsletter() {
   const [email, setEmail] = useState('');
@@ -14,15 +12,18 @@ export default function FooterNewsletter() {
     setIsSubmitting(true);
     setSubmitStatus(null);
     try {
-      await emailjs.send(
-        emailJSConfig.serviceId,
-        emailJSConfig.templateNewsletter,
-        { to_name: 'Équipe Finassur', from_name: 'Nouvel Abonné Newsletter', email, message: 'Demande inscription newsletter', type: 'newsletter' },
-        emailJSConfig.publicKey
-      );
-      setSubmitStatus('success');
-      setEmail('');
-      setTimeout(() => setSubmitStatus(null), 5000);
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setSubmitStatus('success');
+        setEmail('');
+        setTimeout(() => setSubmitStatus(null), 5000);
+      } else {
+        setSubmitStatus('error');
+      }
     } catch (error) {
       console.error('Newsletter error:', error);
       setSubmitStatus('error');

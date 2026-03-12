@@ -6,6 +6,7 @@ import { checkRateLimit } from '@/lib/rateLimit';
 import { validateEmail, validatePhone, validateSIREN } from '@/utils/validation';
 import { getSession } from '@auth0/nextjs-auth0';
 import { syncUser } from '@/lib/users';
+import { sendConfirmationDemande, sendAlerteAdmin } from '@/lib/email';
 
 const AMOUNTS = [
   '3 000€ - 10 000€',
@@ -26,6 +27,13 @@ const SECTORS = [
   'Services',
   'Autre',
 ];
+
+function parseAmountFromLabel(label) {
+  const match = label?.match(/[\d\s]+/);
+  if (!match) return null;
+  const num = parseInt(match[0].replace(/\s/g, ''), 10);
+  return isNaN(num) ? null : num;
+}
 
 function getClientIp(request) {
   return (
@@ -117,7 +125,7 @@ export async function POST(request) {
 
     do {
       reference = generateReference();
-      const existing = await prisma.demandeFinancement.findUnique({
+      const existing = await prisma.application.findUnique({
         where: { reference },
       });
       if (!existing) break;
@@ -131,25 +139,40 @@ export async function POST(request) {
       );
     }
 
-    await prisma.demandeFinancement.create({
+    const productType = body.requestType === 'assurance' ? 'RC_PRO' : 'PRET_PRO';
+    const amountNum = body.requestType === 'financement' ? parseAmountFromLabel(body.amount) : null;
+
+    await prisma.application.create({
       data: {
         reference,
-        requestType: body.requestType,
-        companyName: body.companyName.trim(),
+        userId,
+        productType,
         siren: body.siren.replace(/\s/g, ''),
+        companyName: body.companyName.trim(),
         sector: body.sector,
-        amount: body.amount,
-        equipmentType: body.equipmentType || null,
-        firstName: body.firstName.trim(),
-        lastName: body.lastName.trim(),
+        description: body.message?.trim() || null,
         email: body.email.trim(),
         phone: body.phone.trim(),
-        message: body.message?.trim() || null,
-        ipAddress: ip !== 'unknown' ? ip : null,
-        userAgent: request.headers.get('user-agent')?.slice(0, 500) || null,
-        userId: userId,
+        firstName: body.firstName?.trim() || null,
+        lastName: body.lastName?.trim() || null,
+        amount: amountNum,
+        equipmentType: body.equipmentType || null,
       },
     });
+
+    // Emails (non bloquant si SMTP non configuré)
+    sendConfirmationDemande({
+      to: body.email.trim(),
+      reference,
+      companyName: body.companyName.trim(),
+    }).catch((e) => console.error('Email confirmation:', e));
+    sendAlerteAdmin({
+      reference,
+      companyName: body.companyName.trim(),
+      productType,
+      amount: body.amount,
+      email: body.email.trim(),
+    }).catch((e) => console.error('Email alerte admin:', e));
 
     return NextResponse.json({
       success: true,

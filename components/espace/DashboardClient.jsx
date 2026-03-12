@@ -7,8 +7,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 const STATUS_LABELS = {
   en_attente: { label: 'Reçu', color: 'bg-amber-100 text-amber-800', icon: 'fa-regular fa-clock' },
   en_cours: { label: 'Analyse', color: 'bg-blue-100 text-blue-800', icon: 'fa-solid fa-magnifying-glass' },
+  documents_manquants: { label: 'Documents', color: 'bg-orange-100 text-orange-800', icon: 'fa-solid fa-file' },
+  devis_envoye: { label: 'Devis envoyé', color: 'bg-cyan-100 text-cyan-800', icon: 'fa-solid fa-file-invoice' },
+  devis_accepte: { label: 'Devis accepté', color: 'bg-indigo-100 text-indigo-800', icon: 'fa-solid fa-check' },
+  signature_en_attente: { label: 'Signature', color: 'bg-purple-100 text-purple-800', icon: 'fa-solid fa-pen' },
+  signe: { label: 'Signé', color: 'bg-teal-100 text-teal-800', icon: 'fa-solid fa-signature' },
+  transmis: { label: 'Transmis', color: 'bg-sky-100 text-sky-800', icon: 'fa-solid fa-paper-plane' },
   validee: { label: 'Accepté', color: 'bg-green-100 text-green-800', icon: 'fa-solid fa-check-circle' },
   refusee: { label: 'Refusé', color: 'bg-red-100 text-red-800', icon: 'fa-solid fa-xmark-circle' },
+  finalise: { label: 'Finalisé', color: 'bg-emerald-100 text-emerald-800', icon: 'fa-solid fa-flag-checkered' },
 };
 
 export default function DashboardClient({ user, dbUser, initialDemandes }) {
@@ -23,8 +30,17 @@ export default function DashboardClient({ user, dbUser, initialDemandes }) {
     else setGreeting('Bonsoir');
   }, []);
 
-  // Calcul du score de complétion du profil (simulation)
-  const completionScore = dbUser.documents?.length > 0 ? 85 : 65;
+  // Score de complétion basé sur les données réelles du profil
+  const completionScore = (() => {
+    let score = 30; // base : compte créé
+    if (dbUser.email) score += 20;
+    if (dbUser.name) score += 10;
+    if (dbUser.phone) score += 10;
+    if (dbUser.company) score += 10;
+    const hasKbis = demandes.some(d => d.documents?.some(doc => doc.type === 'KBIS'));
+    if (hasKbis) score += 20;
+    return Math.min(score, 100);
+  })();
 
   const handleFileUpload = async (demandeId, file, type) => {
     if (!file) return;
@@ -32,6 +48,7 @@ export default function DashboardClient({ user, dbUser, initialDemandes }) {
     setUploadingId(demandeId);
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('applicationId', demandeId);
     formData.append('demandeId', demandeId);
     formData.append('type', type);
 
@@ -87,7 +104,7 @@ export default function DashboardClient({ user, dbUser, initialDemandes }) {
               <div className="relative group">
                 <div className="absolute -inset-1.5 bg-gradient-to-r from-secondary via-accent to-secondary rounded-full blur opacity-40 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-spin-slow"></div>
                 <img
-                  src={user.picture || 'https://via.placeholder.com/64'}
+                  src={user.picture || '/Finassurs_logo.jpeg'}
                   alt={user.name}
                   className="relative w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover transform transition-transform group-hover:scale-105"
                 />
@@ -160,7 +177,7 @@ export default function DashboardClient({ user, dbUser, initialDemandes }) {
                     >
                       <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       <div className="flex flex-wrap items-start justify-between gap-6 relative z-10 mb-8">
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-3">
                             <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] bg-secondary/5 px-2 py-1 rounded-md">{d.reference}</span>
                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 ${STATUS_LABELS[d.status]?.color} ring-4 ring-white shadow-sm`}>
@@ -168,8 +185,13 @@ export default function DashboardClient({ user, dbUser, initialDemandes }) {
                               {STATUS_LABELS[d.status]?.label}
                             </span>
                           </div>
-                          <h3 className="font-black text-primary text-xl uppercase tracking-tight">{d.equipmentType || d.companyName}</h3>
+                          <Link href={`/espace/${d.id}`} className="block group/link">
+                            <h3 className="font-black text-primary text-xl uppercase tracking-tight group-hover/link:text-secondary transition-colors">{d.equipmentType || d.companyName}</h3>
+                          </Link>
                           <p className="text-gray-400 font-bold text-sm mt-1">{d.amount} • {new Date(d.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                          <Link href={`/espace/${d.id}`} className="inline-flex items-center gap-2 mt-3 text-sm font-bold text-secondary hover:underline">
+                            Voir le détail <i className="fa-solid fa-arrow-right text-xs"></i>
+                          </Link>
                         </div>
                         
                         <div className="flex items-center gap-3">

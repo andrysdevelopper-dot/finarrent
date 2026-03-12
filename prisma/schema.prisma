@@ -1,66 +1,163 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Finassur — Schema v3.0 (Mars 2026)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  auth0Id   String   @unique
-  email     String   @unique
-  name      String?
-  role      String   @default("client") // Roles: "client", "admin"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  demandes  DemandeFinancement[]
+// ─── ENUMS ────────────────────────────────────────────────
+enum Role {
+  CLIENT
+  ADMIN
+  PARTNER
 }
 
-model DemandeFinancement {
-  id            String   @id @default(cuid())
-  reference     String   @unique
-  requestType   String
-  companyName   String
-  siren         String
-  sector        String
-  amount        String
+enum ProductType {
+  PRET_PRO      // Prêt professionnel
+  CREDIT_BAIL   // Crédit-bail
+  LOA           // Location avec Option d'Achat
+  LLD           // Location Longue Durée
+  LEASING_OPS   // Leasing Opérationnel
+  RC_PRO        // RC Professionnelle (assurance)
+}
+
+enum PartnerType {
+  BANK
+  INSURANCE
+  LEASING
+}
+
+enum ApplicationStatus {
+  PENDING           // Soumis, non traité
+  REVIEWING         // Admin analyse
+  DOCUMENTS_NEEDED  // Client doit compléter
+  QUOTE_SENT        // Devis envoyé au client
+  QUOTE_ACCEPTED    // Client a accepté le devis
+  PENDING_SIGNATURE // En attente de signature
+  SIGNED            // Contrat signé
+  TRANSMITTED       // Dossier reversé au partenaire
+  APPROVED          // Partenaire a validé
+  REJECTED          // Dossier refusé
+  COMPLETED         // Fonds débloqués / couverture active
+}
+
+enum DocumentType {
+  KBIS
+  RIB
+  CNI
+  BILAN
+  CONTRAT
+  AUTRE
+}
+
+// ─── MODELS ───────────────────────────────────────────────
+model User {
+  id           String        @id @default(cuid())
+  auth0Id      String        @unique
+  email        String        @unique
+  name         String?
+  phone        String?
+  company      String?
+  legalForm    String?
+  role         Role          @default(CLIENT)
+  partnerId    String?
+  partner      Partner?      @relation(fields: [partnerId], references: [id])
+  applications Application[]
+  messages     Message[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Partner {
+  id           String        @id @default(cuid())
+  name         String
+  type         PartnerType
+  contactEmail String
+  isActive     Boolean       @default(true)
+  notes        String?
+  users        User[]
+  applications Application[]
+  commissions  Commission[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Application {
+  id            String            @id @default(cuid())
+  userId        String
+  user          User              @relation(fields: [userId], references: [id])
+  productType   ProductType
+  status        ApplicationStatus @default(PENDING)
+  amount        Float?
+  duration      Int?
   equipmentType String?
-  firstName     String
-  lastName      String
-  email         String
-  phone         String
-  message       String?
-  status        String   @default("en_attente")
-  ipAddress     String?
-  userAgent     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  siren         String?
+  companyName   String?
+  legalForm     String?
+  sector        String?
+  description   String?
+  quoteDetails  Json?
+  partnerId     String?
+  partner       Partner?          @relation(fields: [partnerId], references: [id])
   adminNotes    String?
-  
-  // Relations
-  userId        String?
-  user          User?      @relation(fields: [userId], references: [id])
+  transmittedAt DateTime?
   documents     Document[]
+  messages      Message[]
+  statusHistory StatusHistory[]
+  commissions   Commission[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
 model Document {
-  id          String   @id @default(cuid())
-  filename    String
-  originalName String
-  path        String
-  mimeType    String?
-  type        String   @default("autre") // "kbis", "rib", "cni", "autre"
-  fileSize    Int?
-  createdAt   DateTime @default(now())
-  
-  demandeId   String
-  demande     DemandeFinancement @relation(fields: [demandeId], references: [id], onDelete: Cascade)
+  id            String       @id @default(cuid())
+  applicationId String
+  application   Application  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  uploadedById  String
+  type          DocumentType @default(AUTRE)
+  fileName      String
+  fileUrl       String       // Chemin Supabase Storage
+  fileSize      Int
+  mimeType      String
+  createdAt     DateTime     @default(now())
+}
+
+model Message {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  senderId      String
+  sender        User        @relation(fields: [senderId], references: [id])
+  content       String
+  isAdminOnly   Boolean     @default(false)
+  readAt        DateTime?
+  createdAt     DateTime    @default(now())
+}
+
+model StatusHistory {
+  id            String            @id @default(cuid())
+  applicationId String
+  application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  changedById   String
+  fromStatus    ApplicationStatus
+  toStatus      ApplicationStatus
+  comment       String?
+  createdAt     DateTime          @default(now())
+}
+
+model Commission {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  partnerId     String
+  partner       Partner     @relation(fields: [partnerId], references: [id])
+  amount        Float
+  rate          Float
+  status        String      @default("PENDING")
+  paidAt        DateTime?
+  createdAt     DateTime    @default(now())
 }

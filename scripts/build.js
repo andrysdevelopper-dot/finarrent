@@ -16,30 +16,47 @@ import path from 'path';
 console.log('🏗️ Starting build process...');
 
 try {
-    // 1. Switch to PostgreSQL for production
     const schemaPath = path.join(process.cwd(), 'prisma', 'schema.prisma');
-    if (fs.existsSync(schemaPath)) {
-        console.log('🛠️ Configuring Prisma for PostgreSQL...');
-        let schemaContent = fs.readFileSync(schemaPath, 'utf8');
-        schemaContent = schemaContent.replace(/provider = "sqlite"/g, 'provider = "postgresql"');
-        fs.writeFileSync(schemaPath, schemaContent);
-    }
 
-    // 2. Generate Prisma Client
-    console.log('📦 Generating Prisma Client...');
-    execSync('npx prisma generate', { stdio: 'inherit' });
-
-    // 3. Database Sync
-    console.log('🗄️ Synchronizing database schema...');
     try {
-        execSync('npx prisma db push --accept-data-loss --skip-generate', { stdio: 'inherit' });
-    } catch (dbError) {
-        console.warn('⚠️ Warning: Database sync encountered an issue, but continuing build...', dbError.message);
-    }
+        // 1. Generate Prisma Client
+        console.log('📦 Generating Prisma Client...');
+        execSync('npx prisma generate', { stdio: 'inherit' });
 
-    // 4. Build Next.js
-    console.log('⚡ Building Next.js application...');
-    execSync('npm run build:next', { stdio: 'inherit' });
+        // 2. Database migrations (production-safe)
+        console.log('🗄️ Running database migrations...');
+        try {
+            execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+        } catch (dbError) {
+            console.warn('⚠️ Warning: Database migration encountered an issue, but continuing build...', dbError.message);
+        }
+
+        // 3. Build Next.js
+        console.log('⚡ Building Next.js application...');
+        execSync('npm run build:next', { stdio: 'inherit' });
+
+        // 4. Handling standalone mode assets
+        console.log('📂 Copying static assets to standalone folder...');
+        const standalonePath = path.join(process.cwd(), '.next', 'standalone');
+        if (fs.existsSync(standalonePath)) {
+            // ... (copying logic)
+            const publicSrc = path.join(process.cwd(), 'public');
+            const publicDst = path.join(standalonePath, 'public');
+            if (fs.existsSync(publicSrc)) {
+                fs.cpSync(publicSrc, publicDst, { recursive: true });
+                console.log('✅ Public assets copied.');
+            }
+
+            const staticSrc = path.join(process.cwd(), '.next', 'static');
+            const staticDst = path.join(standalonePath, '.next', 'static');
+            if (fs.existsSync(staticSrc)) {
+                fs.cpSync(staticSrc, staticDst, { recursive: true });
+                console.log('✅ Static Next.js assets copied.');
+            }
+        }
+    } finally {
+        // No need to revert anymore as we are staying with PostgreSQL
+    }
 
     console.log('✅ Build completed successfully!');
 } catch (error) {

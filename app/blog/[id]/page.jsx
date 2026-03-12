@@ -3,13 +3,15 @@ import { blogData } from '@/assets/data/blog';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
-  const post = blogData.find(p => p.id === Number(params.id));
+  const { id } = await params;
+  const post = blogData.find(p => p.id === Number(id));
   if (!post) return { title: 'Article | Finassur' };
   return { title: `${post.title} | Finassur`, description: post.excerpt };
 }
 
-export default function BlogDetailPage({ params }) {
-  const post = blogData.find(p => p.id === Number(params.id));
+export default async function BlogDetailPage({ params }) {
+  const { id } = await params;
+  const post = blogData.find(p => p.id === Number(id));
   if (!post) notFound();
 
   return (

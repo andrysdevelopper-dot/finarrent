@@ -34,3 +34,9 @@ prisma/*.db
 # Archives et fichiers système
 templates.rar
 nul
+
+# Documents uploadés (données sensibles — jamais commités)
+private/uploads/
+
+# Double SQLite résiduel
+prisma/prisma/

@@ -3,13 +3,15 @@ import { sectorsData } from '@/assets/data/sectors';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
-  const sector = sectorsData.find(s => s.id === params.id);
+  const { id } = await params;
+  const sector = sectorsData.find(s => s.id === id);
   if (!sector) return { title: 'Secteur | Finassur' };
   return { title: `${sector.title} | Finassur`, description: sector.description };
 }
 
-export default function SectorDetailPage({ params }) {
-  const sector = sectorsData.find(s => s.id === params.id);
+export default async function SectorDetailPage({ params }) {
+  const { id } = await params;
+  const sector = sectorsData.find(s => s.id === id);
   if (!sector) notFound();
 
   return (

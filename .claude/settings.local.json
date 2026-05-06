@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(taskkill //F //PID 38176 //PID 15464)",
+      "Bash(npm run *)",
+      "Bash(tee /tmp/finassur-build.log)",
+      "Bash(awk '{for\\(i=NF;i>=1;i--\\){if\\($i ~ /^[0-9]+$/\\){print $i; break}}}')",
+      "Bash(xargs -r -I {} taskkill //F //PID {})",
+      "Bash(curl -sL \"http://localhost:3002/\" --max-time 90)",
+      "Bash(curl -sL -o /dev/null -w \"homepage: %{http_code} %{time_total}s\\\\n\" http://localhost:3002/ --max-time 10)"
     ]
   }
 }

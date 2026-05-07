@@ -8,7 +8,10 @@
       "Bash(awk '{for\\(i=NF;i>=1;i--\\){if\\($i ~ /^[0-9]+$/\\){print $i; break}}}')",
       "Bash(xargs -r -I {} taskkill //F //PID {})",
       "Bash(curl -sL \"http://localhost:3002/\" --max-time 90)",
-      "Bash(curl -sL -o /dev/null -w \"homepage: %{http_code} %{time_total}s\\\\n\" http://localhost:3002/ --max-time 10)"
+      "Bash(curl -sL -o /dev/null -w \"homepage: %{http_code} %{time_total}s\\\\n\" http://localhost:3002/ --max-time 10)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:3000/api/health)",
+      "Bash(curl -s -o /dev/null -w \"Home HTTP %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
